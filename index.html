@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 12 Biology Quiz - जीवों में जनन</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .quiz-container { background: white; width: 100%; max-width: 600px; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; font-size: 22px; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: #7f8c8d; }
+        .question { font-size: 18px; margin-bottom: 20px; color: #34495e; font-weight: 600; }
+        .option { display: block; width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 8px; cursor: pointer; transition: 0.3s; text-align: left; background: none; font-size: 16px; }
+        .option:hover { background-color: #f7f9f9; border-color: #bdc3c7; }
+        .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; }
+        .wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        #next-btn { display: none; width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        #result-card { text-align: center; display: none; }
+        .score-big { font-size: 48px; color: #3498db; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Biology Test: जीवों में जनन</h1>
+    
+    <div id="quiz-box">
+        <div class="stats">
+            <span>प्रश्न: <span id="current-idx">1</span>/20</span>
+            <span>स्कोर: <span id="score">0</span></span>
+        </div>
+        <div class="question" id="q-text">प्रश्न यहाँ लोड होगा...</div>
+        <div id="options-container"></div>
+        <button id="next-btn" onclick="nextQuestion()">अगला प्रश्न</button>
+    </div>
+
+    <div id="result-card">
+        <h2>टेस्ट पूरा हुआ!</h2>
+        <div class="score-big" id="final-score">0</div>
+        <p id="feedback"></p>
+        <button class="option" style="text-align:center; background:#3498db; color:white;" onclick="location.reload()">फिर से कोशिश करें</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "आम के फल में खाने वाला भाग कौन सा है?", a: ["बाह्य फलभित्ति", "मध्य फलभित्ति", "अंतः फलभित्ति", "बीजांडसन"], c: 1 },
+        { q: "समसूत्री विभाजन किसमें होता है?", a: ["जनन कोशिका", "कायिक कोशिका", "दोनों में", "इनमें से कोई नहीं"], c: 1 },
+        { q: "बिना निषेचन के फल बनने की प्रक्रिया क्या है?", a: ["बहुभ्रूणता", "अनिषेकफलन", "युग्मकजनन", "असंगजनन"], c: 1 },
+        { q: "ईस्ट में प्रजनन मुख्यतः होता है?", a: ["विखंडन", "मुकुलन", "कोनिडिया", "जेम्यूल्स"], c: 1 },
+        { q: "कौन 'उभयलिंगी' प्राणी है?", a: ["मुर्गी", "सांप", "केंचुआ", "कॉकरोच"], c: 2 },
+        { q: "बंगाल का आतंक किसे कहते हैं?", a: ["कमल", "जलकुंभी", "हाइड्रिला", "शैवाल"], c: 1 },
+        { q: "युग्मक (Gametes) हमेशा होते हैं?", a: ["अगुणित (n)", "द्विगुणित (2n)", "त्रिगुणित", "बहुगुणित"], c: 0 },
+        { q: "आलू की 'आँखें' क्या हैं?", a: ["जड़", "कक्षस्थ कलिकाएँ", "अस्थानिक जड़ें", "पुष्प"], c: 1 },
+        { q: "प्राकृतिक अनिषेकजनन होता है:", a: ["मधुमक्खी में", "मेंढक में", "मनुष्य में", "केले में"], c: 0 },
+        { q: "पेनिसिलियम में जनन संरचना है:", a: ["जूस्पोर", "कोनिडिया", "कलिका", "प्रकंद"], c: 1 },
+        { q: "युग्मनज (Zygote) हमेशा होता है:", a: ["n", "2n", "3n", "4n"], c: 1 },
+        { q: "अदरक में कायिक प्रवर्धन होता है:", a: ["बल्ब", "प्रकंद", "कंद", "रनर"], c: 1 },
+        { q: "नॉन-प्राइमेट्स में जनन चक्र है:", a: ["आर्तव चक्र", "मद चक्र", "युग्मक चक्र", "कोई नहीं"], c: 1 },
+        { q: "बाह्य निषेचन किसमें होता है?", a: ["सरीसृप", "पक्षी", "मछली व शैवाल", "स्तनधारी"], c: 2 },
+        { q: "पत्थचट्टा में जनन होता है:", a: ["तने से", "पत्तियों से", "जड़ों से", "बीज से"], c: 1 },
+        { q: "अंडाशय विकसित होकर बनाता है:", a: ["बीज", "फल", "भ्रूण", "पुष्पासन"], c: 1 },
+        { q: "सजीवप्रजक (Viviparous) जीव है:", a: ["मेंढक", "बतख", "मनुष्य", "सांप"], c: 2 },
+        { q: "बिना निषेचन के बीज बनना है:", a: ["अनिषेकफलन", "असंगजनन", "कायिक जनन", "निषेचन"], c: 1 },
+        { q: "प्लेनेरिया में मुख्य विधि है:", a: ["मुकुलन", "पुनरुद्भवन", "विखंडन", "बीजाणु"], c: 1 },
+        { q: "जलकुंभी जल से क्या खींचती है?", a: ["CO2", "ऑक्सीजन", "नाइट्रोजन", "हाइड्रोजन"], c: 1 }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentQ];
+        document.getElementById("q-text").innerText = q.q;
+        document.getElementById("current-idx").innerText = currentQ + 1;
+        const container = document.getElementById("options-container");
+        container.innerHTML = "";
+        
+        q.a.forEach((opt, i) => {
+            const btn = document.createElement("button");
+            btn.className = "option";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            container.appendChild(btn);
+        });
+        document.getElementById("next-btn").style.display = "none";
+    }
+
+    function checkAnswer(idx, btn) {
+        const correctIdx = questions[currentQ].c;
+        const allBtns = document.querySelectorAll(".option");
+        allBtns.forEach(b => b.disabled = true);
+
+        if(idx === correctIdx) {
+            btn.classList.add("correct");
+            score++;
+            document.getElementById("score").innerText = score;
+        } else {
+            btn.classList.add("wrong");
+            allBtns[correctIdx].classList.add("correct");
+        }
+        document.getElementById("next-btn").style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if(currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById("quiz-box").style.display = "none";
+        document.getElementById("result-card").style.display = "block";
+        document.getElementById("final-score").innerText = score + "/20";
+        document.getElementById("feedback").innerText = score > 15 ? "शानदार तैयारी!" : "थोड़ा और अभ्यास करें।";
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
